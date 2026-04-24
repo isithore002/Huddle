@@ -1,0 +1,28 @@
+{
+  "name": "huddle",
+  "version": "0.1.0",
+  "description": "Intent-Matched Bulk Purchase Coalitions over AXL P2P Mesh",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "buyer": "node src/buyer-agent/index.js",
+    "seller": "node src/seller-agent/index.js",
+    "test:axl": "node scripts/test-axl.js",
+    "test:rollback": "node scripts/test-rollback.js",
+    "simulate": "node scripts/simulate-peers.js"
+  },
+  "dependencies": {
+    "@0glabs/0g-ts-sdk": "^0.3.3",
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@x402/axios": "^2.10.0",
+    "@x402/evm": "^2.10.0",
+    "axios": "^1.7.0",
+    "dotenv": "^16.4.0",
+    "ethers": "^5.7.2",
+    "tslib": "^2.8.1",
+    "viem": "^2.48.4"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Environment
+.env
+
+# AXL build artifacts (keep binary, ignore build dir)
+axl-build/
+
+# Keys (sensitive)
+configs/*.pem
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# markdown files 
+docs/*.md
