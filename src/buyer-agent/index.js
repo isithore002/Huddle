@@ -59,6 +59,15 @@ function pollForCoalition(myHash, myRawIntent) {
         console.log(`\n[BuyerAgent] ⏳ Triggering Phase 5 KeeperHub x402 commit...`);
         readline.close();
       });
+
+      // Update API State for Frontend
+      currentCoalitionStatus.deal = {
+        productId: parsed.productId,
+        finalPrice: parsed.finalPrice,
+        retailPrice: 1800,
+        sellerSig: parsed.sellerSig
+      };
+      currentCoalitionStatus.status = 'DEAL_FOUND';
     }
 
     // Process intent hashes
@@ -127,9 +136,53 @@ async function revealToCluster(peers, rawIntent, hash) {
   }
 }
 
+// ─── Frontend Integration Server ─────────────────────────────
+const express = require('express');
+const cors = require('cors');
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+let activeHash = '';
+let currentRawIntent = null;
+let currentCoalitionStatus = { count: 0, target: K_THRESHOLD, status: 'FORMING', deal: null };
+
+app.post('/submit-intent', async (req, res) => {
+  const { productId, maxPrice, daysToWait } = req.body;
+  if (!productId || !maxPrice) return res.status(400).json({ error: 'Missing params' });
+
+  const { hash, rawIntent } = await submitIntent(productId, maxPrice, daysToWait || 5);
+  activeHash = hash;
+  currentRawIntent = rawIntent;
+  currentCoalitionStatus.count = 1;
+  currentCoalitionStatus.status = 'FORMING';
+  
+  pollForCoalition(hash, rawIntent);
+  res.json({ hash });
+});
+
+app.get('/coalition-status', (req, res) => {
+  const queryHash = req.query.hash;
+  if (queryHash && queryHash === activeHash) {
+    // Inject the latest map values
+    const existing = hashMap.get(activeHash);
+    if (existing) {
+      currentCoalitionStatus.count = existing.count;
+    }
+  }
+  res.json(currentCoalitionStatus);
+});
+
+// Expose immediately to avoid Next.js ECONNREFUSED crashes
+app.listen(3001, '127.0.0.1', () => {
+  console.log('[BuyerAgent] 🌐 Express API listening on http://127.0.0.1:3001');
+  console.log('[BuyerAgent] Waiting for Frontend UI commands...');
+});
+
 async function main() {
   console.log('═══════════════════════════════════════════════');
-  console.log('  🛒  HUDDLE — Buyer Agent (Phase 2)');
+  console.log('  🛒  HUDDLE — Buyer Agent (Phase 2->6)');
   console.log('═══════════════════════════════════════════════');
 
   const ready = await axl.waitForReady(60, 1000);
@@ -137,9 +190,6 @@ async function main() {
     console.error('[Buyer] ❌ AXL node not reachable on port', BUYER_API_PORT);
     process.exit(1);
   }
-
-  const { hash, rawIntent } = await submitIntent('LG-OLED-65', 1800, 5);
-  pollForCoalition(hash, rawIntent);
 }
 
 // Ensure the functions can be required by tests, but also run if invoked directly
