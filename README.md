@@ -43,22 +43,17 @@ openssl genpkey -algorithm ed25519 -out configs/seller-private.pem
 npm install
 ```
 
-### 4. Start AXL Nodes (separate terminals)
+### 4. Start Stack (separate terminals)
+The agents now auto-spawn the AXL mesh nodes.
 ```bash
-# Terminal 1 — Buyer AXL Node
-.\axl-node.exe -config configs/buyer-node.json
-
-# Terminal 2 — Seller AXL Node
-.\axl-node.exe -config configs/seller-node.json
-```
-
-### 5. Run Agents (separate terminals)
-```bash
-# Terminal 3 — Seller Agent (start first)
+# Terminal 1 — Seller Agent (Marketplace)
 npm run seller
 
-# Terminal 4 — Buyer Agent
+# Terminal 2 — Buyer Agent & Next.js Server
 npm run buyer
+
+# Terminal 3 — Dashboard UI
+npm run ui
 ```
 
 ### 6. Verify

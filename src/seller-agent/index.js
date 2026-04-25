@@ -28,9 +28,24 @@ const RETAIL_PRICES = {
 
 async function listenForOffers() {
   console.log('═══════════════════════════════════════════════');
-  console.log('  🏪  HUDDLE — Seller Agent (Phase 3)');
+  console.log('  🏪  HUDDLE — Seller Agent (Phase 3->6)');
   console.log('═══════════════════════════════════════════════');
   
+  const { spawn } = require('child_process');
+  let axlProcess = null;
+
+  try {
+    const isUp = await axl.waitForReady(2, 500);
+    if (!isUp) throw new Error('Not up');
+  } catch (err) {
+    console.log('[SellerAgent] ⚙️  Auto-starting embedded AXL Mesh Node...');
+    axlProcess = spawn('axl-node.exe', ['-config', 'configs\\seller-node.json'], {
+      stdio: 'ignore',
+      detached: true
+    });
+    axlProcess.unref();
+  }
+
   const ready = await axl.waitForReady(60, 1000);
   if (!ready) {
     console.error('[SellerAgent] ❌ AXL node not reachable on port', SELLER_API_PORT);

@@ -2,11 +2,11 @@
 echo Starting Huddle Hackathon Stack...
 
 echo [1/5] Starting Buyer AXL Node...
-start "AXL Buyer Node" cmd /c "bin\axl-windows-amd64.exe -c configs\buyer-node.json"
+start "AXL Buyer Node" cmd /c "axl-node.exe -config configs\buyer-node.json"
 timeout /t 1 /nobreak > NUL
 
 echo [2/5] Starting Seller AXL Node...
-start "AXL Seller Node" cmd /c "bin\axl-windows-amd64.exe -c configs\seller-node.json"
+start "AXL Seller Node" cmd /c "axl-node.exe -config configs\seller-node.json"
 timeout /t 2 /nobreak > NUL
 
 echo [3/5] Starting Seller Agent...

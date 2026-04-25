@@ -185,6 +185,21 @@ async function main() {
   console.log('  🛒  HUDDLE — Buyer Agent (Phase 2->6)');
   console.log('═══════════════════════════════════════════════');
 
+  const { spawn } = require('child_process');
+  let axlProcess = null;
+
+  try {
+    const isUp = await axl.waitForReady(2, 500);
+    if (!isUp) throw new Error('Not up');
+  } catch (err) {
+    console.log('[BuyerAgent] ⚙️  Auto-starting embedded AXL Mesh Node...');
+    axlProcess = spawn('axl-node.exe', ['-config', 'configs\\buyer-node.json'], {
+      stdio: 'ignore', // Keep logs clean for the demo split-screen
+      detached: true
+    });
+    axlProcess.unref(); // Allow node to exit if needed
+  }
+
   const ready = await axl.waitForReady(60, 1000);
   if (!ready) {
     console.error('[Buyer] ❌ AXL node not reachable on port', BUYER_API_PORT);
